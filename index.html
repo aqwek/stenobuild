@@ -38,6 +38,11 @@
             align-items: center;
             justify-content: center;
             position: static; /* Default position */
+            transition: all 0.2s ease-in-out; /* Smooth transition for position change */
+        }
+
+        .key.draggable {
+            cursor: move; /* Change cursor to indicate draggable */
         }
 
         .wide {
@@ -176,8 +181,44 @@
         freeMoveCheckbox.addEventListener('change', function () {
             const keys = document.querySelectorAll('.key');
             keys.forEach(key => {
-                key.style.position = this.checked ? 'absolute' : 'static';
+                if (this.checked) {
+                    key.classList.add('draggable');
+                    key.setAttribute('draggable', 'true');
+                } else {
+                    key.classList.remove('draggable');
+                    key.removeAttribute('draggable');
+                }
             });
+
+            // Add drag event listeners if free-move is checked
+            if (this.checked) {
+                keys.forEach(key => {
+                    key.addEventListener('dragstart', function (e) {
+                        e.dataTransfer.setData('text/plain', key.dataset.key);
+                    });
+                });
+
+                document.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                });
+
+                document.addEventListener('drop', function (e) {
+                    const data = e.dataTransfer.getData('text/plain');
+                    const key = document.elementFromPoint(e.clientX, e.clientY);
+                    if (key && key.classList.contains('key')) {
+                        key.textContent = data;
+                        output.textContent = `Dropped Key: ${data}`;
+                    }
+                });
+            } else {
+                // Remove drag event listeners if free-move is unchecked
+                keys.forEach(key => {
+                    key.removeEventListener('dragstart', function () {});
+                });
+
+                document.removeEventListener('dragover', function () {});
+                document.removeEventListener('drop', function () {});
+            }
         });
     </script>
 </body>
