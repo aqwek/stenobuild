@@ -9,17 +9,22 @@
             font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            justify-content: center; /* Center align vertically */
+            align-items: center; /* Center align horizontally */
             height: 100vh;
             background-color: #f0f0f0;
+            margin: 0; /* Remove default margin */
+            position: relative; /* Ensure positioning context */
         }
+
         .keyboard {
             display: grid;
-            grid-template-columns: repeat(11, 1fr);
+            grid-template-columns: repeat(6, auto); /* Adjust columns as per your layout */
             gap: 5px;
-            max-width: 600px;
+            max-width: 800px;
+            margin-bottom: 20px; /* Space between keyboard and output */
         }
+
         .key {
             background-color: #fff;
             border: 1px solid #ccc;
@@ -27,70 +32,129 @@
             text-align: center;
             cursor: pointer;
             user-select: none;
+            width: 50px; /* Fixed width for each key */
+            height: 50px; /* Fixed height for each key */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: static; /* Default position */
+            transition: all 0.3s ease; /* Smooth transition for position change */
         }
+
+        .wide {
+            grid-column: span 2;
+        }
+
         .space {
             grid-column: span 5;
             visibility: hidden;
         }
-        .wide {
-            grid-column: span 2;
+
+        .top-row {
+            grid-row: 1; /* First row */
+            display: flex;
+            justify-content: space-between;
         }
+
+        .middle-row {
+            grid-row: 2; /* Second row */
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .thumb-row {
+            grid-row: 3; /* Third row */
+            display: flex;
+            justify-content: space-between;
+        }
+
         #output {
-            margin-top: 20px;
-            font-size: 1.5em;
+            position: absolute;
+            bottom: 20px; /* Space from bottom */
+            width: 100%;
             text-align: center;
+            font-size: 1.5em;
+        }
+
+        /* Checkbox style */
+        .checkbox-container {
+            position: absolute;
+            top: 10px; /* Space from top */
+            right: 10px; /* Space from right */
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-label {
+            margin-left: 5px;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
-    <div>
-        <div class="keyboard">
+    <div class="keyboard">
+        <!-- Top Row -->
+        <div class="top-row">
             <div class="key" data-key="S">S</div>
             <div class="key" data-key="T">T</div>
             <div class="key" data-key="P">P</div>
             <div class="key" data-key="H">H</div>
-            <div class="key" data-key="*">*</div>
-            <div class="space"></div>
-            <div class="space"></div>
+            <div class="key wide" data-key="*">*</div>
             <div class="key" data-key="*">*</div>
             <div class="key" data-key="F">F</div>
             <div class="key" data-key="P">P</div>
             <div class="key" data-key="L">L</div>
             <div class="key" data-key="T">T</div>
             <div class="key" data-key="D">D</div>
+        </div>
 
+        <!-- Middle Row -->
+        <div class="middle-row">
             <div class="key" data-key="S">S</div>
             <div class="key" data-key="K">K</div>
             <div class="key" data-key="W">W</div>
             <div class="key" data-key="R">R</div>
-            <div class="key" data-key="*">*</div>
-            <div class="space"></div>
-            <div class="space"></div>
+            <div class="key wide" data-key="*">*</div>
             <div class="key" data-key="*">*</div>
             <div class="key" data-key="R">R</div>
             <div class="key" data-key="B">B</div>
             <div class="key" data-key="G">G</div>
             <div class="key" data-key="S">S</div>
             <div class="key" data-key="Z">Z</div>
+        </div>
 
-            <div class="space"></div>
-            <div class="space"></div>
+        <!-- Thumb Row -->
+        <div class="thumb-row">
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" data-key="#">#</div>
             <div class="key" data-key="A">A</div>
             <div class="key" data-key="O">O</div>
-            <div class="space"></div>
-            <div class="space"></div>
-            <div class="space"></div>
-            <div class="space"></div>
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" data-key="E">E</div>
             <div class="key" data-key="U">U</div>
             <div class="key" data-key="#">#</div>
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
         </div>
-        <div id="output">Pressed Key: </div>
     </div>
+
+    <!-- Checkbox for free-moving keys -->
+    <div class="checkbox-container">
+        <input type="checkbox" id="free-move-checkbox">
+        <label for="free-move-checkbox" class="checkbox-label">Free-Move Keys</label>
+    </div>
+
+    <!-- Pressed Key output -->
+    <div id="output">Pressed Key: </div>
+
     <script>
         const keys = document.querySelectorAll('.key');
         const output = document.getElementById('output');
+        const freeMoveCheckbox = document.getElementById('free-move-checkbox');
 
         function handleTouch(e) {
             e.preventDefault();
@@ -108,7 +172,17 @@
         document.querySelector('.keyboard').addEventListener('touchmove', handleTouch, { passive: false });
         document.querySelector('.keyboard').addEventListener('touchend', handleTouch, { passive: false });
         document.querySelector('.keyboard').addEventListener('touchcancel', handleTouch, { passive: false });
+
+        // Add event listener to checkbox
+        freeMoveCheckbox.addEventListener('change', function () {
+            const keys = document.querySelectorAll('.key');
+            keys.forEach(key => {
+                key.style.position = this.checked ? 'absolute' : 'static';
+                if (!this.checked) {
+                    key.style.transform = 'none'; // Reset transform when checkbox unchecked
+                }
+            });
+        });
     </script>
 </body>
 </html>
-    
