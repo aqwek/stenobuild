@@ -1,76 +1,242 @@
-const keys = document.querySelectorAll('.key');
-const output = document.getElementById('output');
-const freeMoveCheckbox = document.getElementById('free-move-checkbox');
-
-const stenoOrder = "STKPWHRAO*EUFRPBLGTSDZ"; // Define stenography order
-
-function handleTouch(e) {
-    e.preventDefault();
-    const pressedKeys = [];
-    for (let touch of e.touches) {
-        const key = document.elementFromPoint(touch.clientX, touch.clientY);
-        if (key && key.classList.contains('key')) {
-            pressedKeys.push(key.dataset.key);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On-Screen Keyboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center; /* Center align horizontally */
+            align-items: center; /* Center align vertically */
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0; /* Remove default margin */
+            position: relative; /* Ensure positioning context */
         }
-    }
 
-    // Sort pressedKeys according to stenography order
-    pressedKeys.sort((a, b) => {
-        return stenoOrder.indexOf(a) - stenoOrder.indexOf(b);
-    });
-
-    // Concatenate pressed keys into a single string
-    let pressedKeysString = '';
-    pressedKeys.forEach(key => {
-        pressedKeysString += key;
-    });
-
-    output.textContent = `Pressed Key: ${pressedKeysString}`;
-}
-
-document.querySelector('.keyboard').addEventListener('touchstart', handleTouch, { passive: false });
-document.querySelector('.keyboard').addEventListener('touchmove', handleTouch, { passive: false });
-document.querySelector('.keyboard').addEventListener('touchend', handleTouch, { passive: false });
-document.querySelector('.keyboard').addEventListener('touchcancel', handleTouch, { passive: false });
-
-// Checkbox functionality remains unchanged
-freeMoveCheckbox.addEventListener('change', function () {
-    const keys = document.querySelectorAll('.key');
-    keys.forEach(key => {
-        if (this.checked) {
-            key.classList.add('draggable');
-            key.setAttribute('draggable', 'true');
-        } else {
-            key.classList.remove('draggable');
-            key.removeAttribute('draggable');
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(6, auto); /* Adjust columns as per your layout */
+            gap: 0px 0px;
+            max-width: 800px;
+            margin-bottom: 20px; /* Space between keyboard and output */
+            /*justify-content: center; /* Center align horizontally */
+            /*align-items: center; /* Center align vertically */
         }
-    });
 
-    if (this.checked) {
-        keys.forEach(key => {
-            key.addEventListener('dragstart', function (e) {
-                e.dataTransfer.setData('text/plain', key.dataset.key);
-            });
-        });
+        .key {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            width: 50px; /* Fixed width for each key */
+            height: 50px; /* Fixed height for each key */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: static; /* Default position */
+            transition: all 0.2s ease-in-out; /* Smooth transition for position change */
+        }
 
-        document.addEventListener('dragover', function (e) {
+            .key.draggable {
+                cursor: move; /* Change cursor to indicate draggable */
+            }
+
+        .space {
+            grid-column: span 5;
+            visibility: hidden;
+        }
+
+        .top-row {
+            grid-row: 1; /* First row */
+            display: flex;
+        }
+
+        .middle-row {
+            grid-row: 2; /* Second row */
+            display: flex;
+        }
+
+        .thumb-row {
+            grid-row: 4; /* Third row */
+            display: flex;
+        }
+
+        .empty-row {
+            grid-row: 3; /* Fourth row */
+            height: 90px; /* Adjust height as needed */
+        }
+
+        #output {
+            position: absolute;
+            bottom: 20px; /* Space from bottom */
+            width: 100%;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        /* Checkbox style */
+        .checkbox-container {
+            position: absolute;
+            top: 10px; /* Space from top */
+            right: 10px; /* Space from right */
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-label {
+            margin-left: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="keyboard">
+        <!-- Top Row -->
+        <div class="top-row">
+            <div class="key" data-key="S">S</div>
+            <div class="key" data-key="T">T</div>
+            <div class="key" data-key="P">P</div>
+            <div class="key" data-key="H">H</div>
+            <div class="key wide" data-key="*">*</div>
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" data-key="*">*</div>
+            <div class="key" data-key="F">F</div>
+            <div class="key" data-key="P">P</div>
+            <div class="key" data-key="L">L</div>
+            <div class="key" data-key="T">T</div>
+            <div class="key" data-key="D">D</div>
+        </div>
+
+        <!-- Middle Row -->
+        <div class="middle-row">
+            <div class="key" data-key="S">S</div>
+            <div class="key" data-key="K">K</div>
+            <div class="key" data-key="W">W</div>
+            <div class="key" data-key="R">R</div>
+            <div class="key wide" data-key="*">*</div>
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" data-key="*">*</div>
+            <div class="key" data-key="R">R</div>
+            <div class="key" data-key="B">B</div>
+            <div class="key" data-key="G">G</div>
+            <div class="key" data-key="S">S</div>
+            <div class="key" data-key="Z">Z</div>
+        </div>
+
+        <!-- Empty Row -->
+        <div class="empty-row"></div>
+
+        <!-- Thumb Row -->
+        <div class="thumb-row">
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" data-key="#">#</div>
+            <div class="key" data-key="A">A</div>
+            <div class="key" data-key="O">O</div>
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" data-key="E">E</div>
+            <div class="key" data-key="U">U</div>
+            <div class="key" data-key="#">#</div>
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+        </div>
+
+    </div>
+
+    <!-- Checkbox for free-moving keys -->
+    <div class="checkbox-container">
+        <input type="checkbox" id="free-move-checkbox">
+        <label for="free-move-checkbox" class="checkbox-label">Free-Move Keys</label>
+    </div>
+
+    <!-- Pressed Key output -->
+    <div id="output">Pressed Key: </div>
+
+    <script>
+        const keys = document.querySelectorAll('.key');
+        const output = document.getElementById('output');
+        const freeMoveCheckbox = document.getElementById('free-move-checkbox');
+
+        const stenoOrder = "STKPWHRAO*EUFRPBLGTSDZ"; // Define stenography order
+
+        function handleTouch(e) {
             e.preventDefault();
-        });
+            const pressedKeys = [];
+            for (let touch of e.touches) {
+                const key = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (key && key.classList.contains('key')) {
+                    pressedKeys.push(key.dataset.key);
+                }
+            }
 
-        document.addEventListener('drop', function (e) {
-            const data = e.dataTransfer.getData('text/plain');
-            const key = document.elementFromPoint(e.clientX, e.clientY);
-            if (key && key.classList.contains('key')) {
-                key.textContent = data;
-                output.textContent = `Dropped Key: ${data}`;
+            // Sort pressedKeys according to stenography order
+            pressedKeys.sort((a, b) => {
+                return stenoOrder.indexOf(a) - stenoOrder.indexOf(b);
+            });
+
+            // Concatenate pressed keys into a single string
+            let pressedKeysString = '';
+            pressedKeys.forEach(key => {
+                pressedKeysString += key;
+            });
+
+            output.textContent = `Pressed Key: ${pressedKeysString}`;
+        }
+
+        document.querySelector('.keyboard').addEventListener('touchstart', handleTouch, { passive: false });
+        document.querySelector('.keyboard').addEventListener('touchmove', handleTouch, { passive: false });
+        document.querySelector('.keyboard').addEventListener('touchend', handleTouch, { passive: false });
+        document.querySelector('.keyboard').addEventListener('touchcancel', handleTouch, { passive: false });
+
+        // Checkbox functionality remains unchanged
+        freeMoveCheckbox.addEventListener('change', function () {
+            const keys = document.querySelectorAll('.key');
+            keys.forEach(key => {
+                if (this.checked) {
+                    key.classList.add('draggable');
+                    key.setAttribute('draggable', 'true');
+                } else {
+                    key.classList.remove('draggable');
+                    key.removeAttribute('draggable');
+                }
+            });
+
+            if (this.checked) {
+                keys.forEach(key => {
+                    key.addEventListener('dragstart', function (e) {
+                        e.dataTransfer.setData('text/plain', key.dataset.key);
+                    });
+                });
+
+                document.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                });
+
+                document.addEventListener('drop', function (e) {
+                    const data = e.dataTransfer.getData('text/plain');
+                    const key = document.elementFromPoint(e.clientX, e.clientY);
+                    if (key && key.classList.contains('key')) {
+                        key.textContent = data;
+                        output.textContent = `Dropped Key: ${data}`;
+                    }
+                });
+            } else {
+                keys.forEach(key => {
+                    key.removeEventListener('dragstart', function () { });
+                });
+
+                document.removeEventListener('dragover', function () { });
+                document.removeEventListener('drop', function () { });
             }
         });
-    } else {
-        keys.forEach(key => {
-            key.removeEventListener('dragstart', function () { });
-        });
 
-        document.removeEventListener('dragover', function () { });
-        document.removeEventListener('drop', function () { });
-    }
-});
+    </script>
+</body>
+</html>
