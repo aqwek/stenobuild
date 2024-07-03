@@ -8,9 +8,8 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
-            justify-content: center; /* Center align vertically */
-            align-items: center; /* Center align horizontally */
+            justify-content: center; /* Center align horizontally */
+            align-items: center; /* Center align vertically */
             height: 100vh;
             background-color: #f0f0f0;
             margin: 0; /* Remove default margin */
@@ -23,8 +22,8 @@
             gap: 0px 0px;
             max-width: 800px;
             margin-bottom: 20px; /* Space between keyboard and output */
-            justify-content: center;
-            align-items: center;
+            justify-content: center; /* Center align horizontally */
+            align-items: center; /* Center align vertically */
         }
 
         .key {
@@ -47,8 +46,6 @@
                 cursor: move; /* Change cursor to indicate draggable */
             }
 
-      
-
         .space {
             grid-column: span 5;
             visibility: hidden;
@@ -57,19 +54,21 @@
         .top-row {
             grid-row: 1; /* First row */
             display: flex;
-            
         }
 
         .middle-row {
             grid-row: 2; /* Second row */
             display: flex;
-            
         }
 
         .thumb-row {
-            grid-row: 3; /* Third row */
+            grid-row: 4; /* Third row */
             display: flex;
-            
+        }
+
+        .empty-row {
+            grid-row: 3; /* Fourth row */
+            height: 9   0px; /* Adjust height as needed */
         }
 
         #output {
@@ -129,9 +128,11 @@
             <div class="key" data-key="Z">Z</div>
         </div>
 
+        <!-- Empty Row -->
+        <div class="empty-row"></div>
+
         <!-- Thumb Row -->
         <div class="thumb-row">
-            
             <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" data-key="#">#</div>
@@ -146,6 +147,7 @@
             <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
         </div>
+
     </div>
 
     <!-- Checkbox for free-moving keys -->
