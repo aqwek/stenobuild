@@ -105,11 +105,11 @@
             <div class="key wide" data-key="*">*</div>
             <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" data-key="*">*</div>
-            <div class="key" data-key="F">F</div>
-            <div class="key" data-key="P">P</div>
-            <div class="key" data-key="L">L</div>
-            <div class="key" data-key="T">T</div>
-            <div class="key" data-key="D">D</div>
+            <div class="key" data-key="-F">F</div>
+            <div class="key" data-key="-P">P</div>
+            <div class="key" data-key="-L">L</div>
+            <div class="key" data-key="-T">T</div>
+            <div class="key" data-key="-D">D</div>
         </div>
 
         <!-- Middle Row -->
@@ -121,11 +121,11 @@
             <div class="key wide" data-key="*">*</div>
             <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" data-key="*">*</div>
-            <div class="key" data-key="R">R</div>
-            <div class="key" data-key="B">B</div>
-            <div class="key" data-key="G">G</div>
-            <div class="key" data-key="S">S</div>
-            <div class="key" data-key="Z">Z</div>
+            <div class="key" data-key="-R">R</div>
+            <div class="key" data-key="-B">B</div>
+            <div class="key" data-key="-G">G</div>
+            <div class="key" data-key="-S">S</div>
+            <div class="key" data-key="-Z">Z</div>
         </div>
 
         <!-- Empty Row -->
@@ -178,7 +178,21 @@
 
             // Sort pressedKeys according to stenography order
             pressedKeys.sort((a, b) => {
-                return stenoOrder.indexOf(a) - stenoOrder.indexOf(b);
+                // Function to determine if the key should be on the right side
+                const isRightSide = key => key.startsWith('-');
+
+                // Compare function for sorting
+                const compareKeys = (keyA, keyB) => {
+                    const aIndex = stenoOrder.indexOf(keyA.replace('-', ''));
+                    const bIndex = stenoOrder.indexOf(keyB.replace('-', ''));
+                    // Sort by stenoOrder index and if both are on the right side, sort lexicographically
+                    if (isRightSide(keyA) && isRightSide(keyB)) {
+                        return keyA.localeCompare(keyB);
+                    }
+                    return aIndex - bIndex;
+                };
+
+                return compareKeys(a, b);
             });
 
             // Concatenate pressed keys into a single string
