@@ -160,48 +160,22 @@
         const output = document.getElementById('output');
         const freeMoveCheckbox = document.getElementById('free-move-checkbox');
 
-        let activeKey = null;
-
-        function handleTouchStart(e) {
+        function handleTouch(e) {
             e.preventDefault();
-            const touch = e.targetTouches[0];
-            activeKey = document.elementFromPoint(touch.clientX, touch.clientY);
-            if (activeKey && activeKey.classList.contains('key') && freeMoveCheckbox.checked) {
-                activeKey.style.position = 'absolute';
-                activeKey.style.zIndex = 1000; // Ensure the active key is above others
-                const rect = activeKey.getBoundingClientRect();
-                activeKey.setAttribute('data-offsetX', touch.clientX - rect.left);
-                activeKey.setAttribute('data-offsetY', touch.clientY - rect.top);
-                document.addEventListener('touchmove', handleTouchMove, { passive: false });
-                document.addEventListener('touchend', handleTouchEnd, { passive: false });
+            const pressedKeys = [];
+            for (let touch of e.touches) {
+                const key = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (key && key.classList.contains('key')) {
+                    pressedKeys.push(key.dataset.key);
+                }
             }
+            output.textContent = `Pressed Key: ${pressedKeys.join(', ')}`;
         }
 
-        function handleTouchMove(e) {
-            e.preventDefault();
-            const touch = e.targetTouches[0];
-            if (activeKey) {
-                const offsetX = parseInt(activeKey.getAttribute('data-offsetX'));
-                const offsetY = parseInt(activeKey.getAttribute('data-offsetY'));
-                activeKey.style.left = touch.clientX - offsetX + 'px';
-                activeKey.style.top = touch.clientY - offsetY + 'px';
-            }
-        }
-
-        function handleTouchEnd(e) {
-            e.preventDefault();
-            if (activeKey) {
-                output.textContent = `Moved Key: ${activeKey.dataset.key}`;
-                activeKey.removeAttribute('style');
-                activeKey.removeAttribute('data-offsetX');
-                activeKey.removeAttribute('data-offsetY');
-                activeKey = null;
-                document.removeEventListener('touchmove', handleTouchMove);
-                document.removeEventListener('touchend', handleTouchEnd);
-            }
-        }
-
-        document.querySelector('.keyboard').addEventListener('touchstart', handleTouchStart, { passive: false });
+        document.querySelector('.keyboard').addEventListener('touchstart', handleTouch, { passive: false });
+        document.querySelector('.keyboard').addEventListener('touchmove', handleTouch, { passive: false });
+        document.querySelector('.keyboard').addEventListener('touchend', handleTouch, { passive: false });
+        document.querySelector('.keyboard').addEventListener('touchcancel', handleTouch, { passive: false });
 
         // Add event listener to checkbox
         freeMoveCheckbox.addEventListener('change', function () {
@@ -209,16 +183,42 @@
             keys.forEach(key => {
                 if (this.checked) {
                     key.classList.add('draggable');
+                    key.setAttribute('draggable', 'true');
                 } else {
                     key.classList.remove('draggable');
-                    key.removeAttribute('style');
-                    key.removeAttribute('data-offsetX');
-                    key.removeAttribute('data-offsetY');
-                    activeKey = null;
-                    document.removeEventListener('touchmove', handleTouchMove);
-                    document.removeEventListener('touchend', handleTouchEnd);
+                    key.removeAttribute('draggable');
                 }
             });
+
+            // Add drag event listeners if free-move is checked
+            if (this.checked) {
+                keys.forEach(key => {
+                    key.addEventListener('dragstart', function (e) {
+                        e.dataTransfer.setData('text/plain', key.dataset.key);
+                    });
+                });
+
+                document.addEventListener('dragover', function (e) {
+                    e.preventDefault();
+                });
+
+                document.addEventListener('drop', function (e) {
+                    const data = e.dataTransfer.getData('text/plain');
+                    const key = document.elementFromPoint(e.clientX, e.clientY);
+                    if (key && key.classList.contains('key')) {
+                        key.textContent = data;
+                        output.textContent = `Dropped Key: ${data}`;
+                    }
+                });
+            } else {
+                // Remove drag event listeners if free-move is unchecked
+                keys.forEach(key => {
+                    key.removeEventListener('dragstart', function () {});
+                });
+
+                document.removeEventListener('dragover', function () {});
+                document.removeEventListener('drop', function () {});
+            }
         });
     </script>
 </body>
