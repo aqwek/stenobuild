@@ -20,9 +20,11 @@
         .keyboard {
             display: grid;
             grid-template-columns: repeat(6, auto); /* Adjust columns as per your layout */
-            gap: 5px;
+            gap: 0px 0px;
             max-width: 800px;
             margin-bottom: 20px; /* Space between keyboard and output */
+            justify-content: center;
+            align-items: center;
         }
 
         .key {
@@ -41,13 +43,11 @@
             transition: all 0.2s ease-in-out; /* Smooth transition for position change */
         }
 
-        .key.draggable {
-            cursor: move; /* Change cursor to indicate draggable */
-        }
+            .key.draggable {
+                cursor: move; /* Change cursor to indicate draggable */
+            }
 
-        .wide {
-            grid-column: span 2;
-        }
+      
 
         .space {
             grid-column: span 5;
@@ -57,19 +57,19 @@
         .top-row {
             grid-row: 1; /* First row */
             display: flex;
-            justify-content: space-between;
+            
         }
 
         .middle-row {
             grid-row: 2; /* Second row */
             display: flex;
-            justify-content: space-between;
+            
         }
 
         .thumb-row {
             grid-row: 3; /* Third row */
             display: flex;
-            justify-content: space-between;
+            
         }
 
         #output {
@@ -104,6 +104,7 @@
             <div class="key" data-key="P">P</div>
             <div class="key" data-key="H">H</div>
             <div class="key wide" data-key="*">*</div>
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" data-key="*">*</div>
             <div class="key" data-key="F">F</div>
             <div class="key" data-key="P">P</div>
@@ -119,6 +120,7 @@
             <div class="key" data-key="W">W</div>
             <div class="key" data-key="R">R</div>
             <div class="key wide" data-key="*">*</div>
+            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" data-key="*">*</div>
             <div class="key" data-key="R">R</div>
             <div class="key" data-key="B">B</div>
@@ -129,7 +131,7 @@
 
         <!-- Thumb Row -->
         <div class="thumb-row">
-            <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
+            
             <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" style="visibility: hidden;"></div> <!-- Placeholder for alignment -->
             <div class="key" data-key="#">#</div>
@@ -213,11 +215,11 @@
             } else {
                 // Remove drag event listeners if free-move is unchecked
                 keys.forEach(key => {
-                    key.removeEventListener('dragstart', function () {});
+                    key.removeEventListener('dragstart', function () { });
                 });
 
-                document.removeEventListener('dragover', function () {});
-                document.removeEventListener('drop', function () {});
+                document.removeEventListener('dragover', function () { });
+                document.removeEventListener('drop', function () { });
             }
         });
     </script>
