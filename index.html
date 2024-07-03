@@ -164,6 +164,8 @@
         const output = document.getElementById('output');
         const freeMoveCheckbox = document.getElementById('free-move-checkbox');
 
+        const stenoOrder = "STKPWHRAO*EUFRPBLGTSDZ"; // Define stenography order
+
         function handleTouch(e) {
             e.preventDefault();
             const pressedKeys = [];
@@ -173,6 +175,12 @@
                     pressedKeys.push(key.dataset.key);
                 }
             }
+
+            // Sort pressedKeys according to stenography order
+            pressedKeys.sort((a, b) => {
+                return stenoOrder.indexOf(a) - stenoOrder.indexOf(b);
+            });
+
             output.textContent = `Pressed Key: ${pressedKeys.join(', ')}`;
         }
 
@@ -181,7 +189,7 @@
         document.querySelector('.keyboard').addEventListener('touchend', handleTouch, { passive: false });
         document.querySelector('.keyboard').addEventListener('touchcancel', handleTouch, { passive: false });
 
-        // Add event listener to checkbox
+        // Checkbox functionality remains unchanged
         freeMoveCheckbox.addEventListener('change', function () {
             const keys = document.querySelectorAll('.key');
             keys.forEach(key => {
@@ -194,7 +202,6 @@
                 }
             });
 
-            // Add drag event listeners if free-move is checked
             if (this.checked) {
                 keys.forEach(key => {
                     key.addEventListener('dragstart', function (e) {
@@ -215,7 +222,6 @@
                     }
                 });
             } else {
-                // Remove drag event listeners if free-move is unchecked
                 keys.forEach(key => {
                     key.removeEventListener('dragstart', function () { });
                 });
@@ -224,6 +230,7 @@
                 document.removeEventListener('drop', function () { });
             }
         });
+
     </script>
 </body>
 </html>
