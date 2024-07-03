@@ -173,7 +173,7 @@
         document.querySelector('.keyboard').addEventListener('touchcancel', handleTouch, { passive: false });
 
         // Add event listener to checkbox
-        freeMoveCheckbox.addEventListener('change', function() {
+        freeMoveCheckbox.addEventListener('change', function () {
             const keys = document.querySelectorAll('.key');
             keys.forEach(key => {
                 key.style.position = this.checked ? 'absolute' : 'static';
