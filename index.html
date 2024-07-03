@@ -23,6 +23,7 @@
             gap: 5px;
             max-width: 800px;
             margin-bottom: 20px; /* Space between keyboard and output */
+            position: relative; /* Ensure positioning context */
         }
 
         .key {
@@ -37,7 +38,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            position: static; /* Default position */
+            position: absolute; /* Positioning relative to parent (.keyboard) */
+            transition: all 0.3s ease; /* Smooth transition */
         }
 
         .wide {
@@ -154,6 +156,18 @@
         const keys = document.querySelectorAll('.key');
         const output = document.getElementById('output');
         const freeMoveCheckbox = document.getElementById('free-move-checkbox');
+        let keyPositions = {}; // Object to store custom key positions
+
+        // Initialize default positions relative to the keyboard
+        keys.forEach(key => {
+            const rect = key.getBoundingClientRect();
+            key.style.left = `${rect.left}px`;
+            key.style.top = `${rect.top}px`;
+            keyPositions[key.dataset.key] = {
+                x: rect.left,
+                y: rect.top
+            };
+        });
 
         function handleTouch(e) {
             e.preventDefault();
@@ -174,9 +188,24 @@
 
         // Add event listener to checkbox
         freeMoveCheckbox.addEventListener('change', function () {
-            const keys = document.querySelectorAll('.key');
             keys.forEach(key => {
-                key.style.position = this.checked ? 'absolute' : 'static';
+                if (this.checked) {
+                    // Save current positions as default if free-move is checked
+                    key.style.transition = 'none'; // Disable transition temporarily
+                    key.style.left = `${keyPositions[key.dataset.key].x}px`;
+                    key.style.top = `${keyPositions[key.dataset.key].y}px`;
+                    setTimeout(() => {
+                        key.style.transition = 'all 0.3s ease'; // Re-enable transition
+                    }, 50);
+                } else {
+                    // Restore default positions when free-move is unchecked
+                    key.style.transition = 'none'; // Disable transition temporarily
+                    key.style.left = 'auto';
+                    key.style.top = 'auto';
+                    setTimeout(() => {
+                        key.style.transition = 'all 0.3s ease'; // Re-enable transition
+                    }, 50);
+                }
             });
         });
     </script>
