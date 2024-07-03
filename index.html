@@ -23,7 +23,6 @@
             gap: 5px;
             max-width: 800px;
             margin-bottom: 20px; /* Space between keyboard and output */
-            position: relative; /* Ensure positioning context */
         }
 
         .key {
@@ -38,8 +37,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            position: absolute; /* Initially set to absolute */
-            transition: all 0.3s ease; /* Smooth transition */
+            position: static; /* Default position */
         }
 
         .wide {
@@ -157,49 +155,6 @@
         const output = document.getElementById('output');
         const freeMoveCheckbox = document.getElementById('free-move-checkbox');
 
-        // Initial positions (can be adjusted)
-        const defaultPositions = {
-            'S': { top: '0px', left: '0px' },
-            'T': { top: '0px', left: '60px' },
-            'P': { top: '0px', left: '120px' },
-            'H': { top: '0px', left: '180px' },
-            '*': { top: '0px', left: '240px' },
-            'F': { top: '0px', left: '300px' },
-            'L': { top: '0px', left: '360px' },
-            'D': { top: '0px', left: '420px' },
-            'K': { top: '60px', left: '0px' },
-            'W': { top: '60px', left: '60px' },
-            'R': { top: '60px', left: '120px' },
-            'B': { top: '60px', left: '180px' },
-            'G': { top: '60px', left: '240px' },
-            'Z': { top: '60px', left: '300px' },
-            '#': { top: '120px', left: '180px' },
-            'A': { top: '120px', left: '240px' },
-            'O': { top: '120px', left: '300px' },
-            'E': { top: '120px', left: '360px' },
-            'U': { top: '120px', left: '420px' },
-        };
-
-        // Function to set positions based on mode (default or custom)
-        function setKeyPositions(freeMove) {
-            keys.forEach(key => {
-                const dataKey = key.dataset.key;
-                if (freeMove) {
-                    // Enable free move (set to absolute)
-                    key.style.position = 'absolute';
-                } else {
-                    // Disable free move (set to default positions)
-                    key.style.position = 'absolute'; // Use absolute to reset positions smoothly
-                    key.style.top = defaultPositions[dataKey].top;
-                    key.style.left = defaultPositions[dataKey].left;
-                }
-            });
-        }
-
-        // Initialize positions on page load
-        setKeyPositions(false);
-
-        // Function to handle touch events
         function handleTouch(e) {
             e.preventDefault();
             const pressedKeys = [];
@@ -217,10 +172,12 @@
         document.querySelector('.keyboard').addEventListener('touchend', handleTouch, { passive: false });
         document.querySelector('.keyboard').addEventListener('touchcancel', handleTouch, { passive: false });
 
-        // Toggle free-move mode on checkbox change
-        freeMoveCheckbox.addEventListener('change', function () {
-            const freeMove = this.checked;
-            setKeyPositions(freeMove);
+        // Add event listener to checkbox
+        freeMoveCheckbox.addEventListener('change', function() {
+            const keys = document.querySelectorAll('.key');
+            keys.forEach(key => {
+                key.style.position = this.checked ? 'absolute' : 'static';
+            });
         });
     </script>
 </body>
